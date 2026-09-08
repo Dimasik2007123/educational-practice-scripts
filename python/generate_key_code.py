@@ -1,0 +1,38 @@
+import random
+from datetime import date
+import psycopg2
+
+def get_connection():
+    conn = psycopg2.connect(
+        host="localhost",
+        database="company",
+        user="postgres",
+        password="G6sjxb7cB"
+    )
+    return conn
+
+def generate_key_code(object_id, client_id, keys_type_id=1):  # по умолчанию 1 — "Вход"
+    connection = get_connection()
+    cursor = connection.cursor()
+    while True:
+        code = random.randint(100000, 999999)
+        cursor.execute("SELECT id FROM keys WHERE locker_code = %s", (code,))
+        if not cursor.fetchone():
+            break
+    key_set_number = random.randint(100000, 999999)
+    cursor.execute("""
+        INSERT INTO keys (
+            real_estate_object_id, client_id, locker_code,
+            key_set_number, quantity, issue_date, keys_type_id
+        ) VALUES (%s, %s, %s, %s, %s, %s, %s)
+        RETURNING id
+    """, (object_id, client_id, code, key_set_number, 6, date.today(), keys_type_id))
+    key_id = cursor.fetchone()[0]
+    connection.commit()
+    cursor.close()
+    connection.close()
+    return code
+
+if __name__ == "__main__":
+    code = generate_key_code(15, 1, keys_type_id=1)  # 1 — "Вход"
+    print(f"Код для постамата: {code}")
