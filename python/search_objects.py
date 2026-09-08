@@ -1,12 +1,17 @@
 import psycopg2
 import psycopg2.extras
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def get_connection():
     conn = psycopg2.connect(
-        host="localhost",
-        database="company",
-        user="postgres",
-        password="G6sjxb7cB"
+        host=os.getenv('DB_HOST'),
+        port=os.getenv('DB_PORT'),
+        database=os.getenv('DB_NAME'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD')
     )
     psycopg2.extras.register_composite('address_type', conn, globally=True)
     return conn

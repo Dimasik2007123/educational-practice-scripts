@@ -1,13 +1,18 @@
 import random
 from datetime import date
 import psycopg2
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def get_connection():
     conn = psycopg2.connect(
-        host="localhost",
-        database="company",
-        user="postgres",
-        password="G6sjxb7cB"
+        host=os.getenv('DB_HOST'),
+        port=os.getenv('DB_PORT'),
+        database=os.getenv('DB_NAME'),
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD')
     )
     return conn
 
