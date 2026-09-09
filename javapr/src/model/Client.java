@@ -34,7 +34,7 @@ public class Client extends Person {
             stmt.setString(1, fullName.getFirstName());
             stmt.setString(2, fullName.getLastName());
             stmt.setString(3, fullName.getPatronymic());
-            stmt.setDate(4, java.sql.Date.valueOf(birthDate));  // LocalDate → java.sql.Date
+            stmt.setDate(4, java.sql.Date.valueOf(birthDate));
             stmt.setString(5, phone);
             stmt.setString(6, email);
             stmt.setInt(7, passport.getSeries());

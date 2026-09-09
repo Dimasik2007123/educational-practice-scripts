@@ -19,6 +19,19 @@ def update_object_status(object_id, new_status_id):
     cursor = connection.cursor()
     try:
         cursor.execute("""
+            SELECT real_estate_status_id
+            FROM real_estate_object
+            WHERE id = %s
+            FOR UPDATE
+        """, (object_id,))
+        object_data = cursor.fetchone()
+        if object_data is not None and object_data[0] == 3:
+            cursor.execute("""
+                DELETE FROM booking
+                WHERE real_estate_object_id = %s
+            """, (object_id,))
+
+        cursor.execute("""
             UPDATE real_estate_object
             SET real_estate_status_id = %s
             WHERE id = %s

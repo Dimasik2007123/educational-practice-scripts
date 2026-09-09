@@ -32,6 +32,19 @@ public class SaleItem {
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
+    void add(Connection conn) throws SQLException {
+        String sql = "INSERT INTO sale_item (sale_id, real_estate_object_id, price, line_number) " +
+                     "VALUES (?, ?, ?, ?) RETURNING id";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, sale.getId());
+            stmt.setInt(2, realEstateObject.getId());
+            stmt.setBigDecimal(3, price);
+            stmt.setInt(4, lineNumber);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) id = rs.getInt(1);
+        }
+    }
+
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public Sale getSale() { return sale; }

@@ -81,7 +81,6 @@ public class Complaint implements CrudOperations {
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
-    // Геттеры и сеттеры
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public LocalDate getFillingDate() { return fillingDate; }

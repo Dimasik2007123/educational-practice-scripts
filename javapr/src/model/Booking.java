@@ -70,10 +70,31 @@ public class Booking implements CrudOperations {
     }
 
     public void bookObject() {
-        if (realEstateObject.isAvailable()) {
-            realEstateObject.updateStatus(new RealEstateStatus(3, "В резерве", "Объект забронирован"));
-            this.add();
+        String insert = "INSERT INTO booking (booking_date, expiration_date, client_id, employee_id, real_estate_object_id) " +
+                        "VALUES (?, ?, ?, ?, ?) RETURNING id";
+        try (Connection conn = DatabaseService.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(insert)) {
+            conn.setAutoCommit(false);
+            if (!RealEstateObject.lockAndReleaseExpiredBooking(conn, realEstateObject.getId())) {
+                conn.rollback();
+                return;
+            }
+            try (PreparedStatement update = conn.prepareStatement(
+                    "UPDATE real_estate_object SET real_estate_status_id = 3 WHERE id = ?")) {
+                update.setInt(1, realEstateObject.getId());
+                update.executeUpdate();
+            }
+            stmt.setDate(1, Date.valueOf(bookingDate));
+            stmt.setDate(2, Date.valueOf(expirationDate));
+            stmt.setInt(3, client.getId());
+            stmt.setInt(4, employee.getId());
+            stmt.setInt(5, realEstateObject.getId());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) id = rs.getInt(1);
+            conn.commit();
+            realEstateObject.setStatus(RealEstateStatus.findById(3));
         }
+        catch (SQLException e) { e.printStackTrace(); }
     }
 
     public void cancelBooking() {
@@ -82,7 +103,7 @@ public class Booking implements CrudOperations {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
-            realEstateObject.updateStatus(new RealEstateStatus(2, "Свободно", "Объект доступен"));
+            realEstateObject.updateStatus(RealEstateStatus.findById(2));
         } catch (SQLException e) { e.printStackTrace(); }
     }
 

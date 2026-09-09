@@ -32,7 +32,6 @@ def generate_key_code(object_id, client_id, keys_type_id=1):
         ) VALUES (%s, %s, %s, %s, %s, %s, %s)
         RETURNING id
     """, (object_id, client_id, code, key_set_number, 6, date.today(), keys_type_id))
-    key_id = cursor.fetchone()[0]
     connection.commit()
     cursor.close()
     connection.close()

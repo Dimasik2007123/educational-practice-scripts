@@ -20,10 +20,28 @@ def book_object(object_id, client_id, employee_id):
     cursor = connection.cursor()
     try:
         cursor.execute("""
-            SELECT real_estate_status_id FROM real_estate_object WHERE id = %s
+            SELECT reo.real_estate_status_id, b.id, b.expiration_date
+            FROM real_estate_object AS reo
+            LEFT JOIN booking AS b ON b.real_estate_object_id = reo.id
+            WHERE reo.id = %s
+            FOR UPDATE OF reo
         """, (object_id,))
-        status = cursor.fetchone()
-        if status and status[0] != 2:
+        object_data = cursor.fetchone()
+        if object_data is None:
+            print("Объект не найден")
+            return False
+
+        status_id, booking_id, expiration_date = object_data
+        expired_booking = (
+            status_id == 3
+            and booking_id is not None
+            and expiration_date < date.today()
+        )
+        if expired_booking:
+            cursor.execute("DELETE FROM booking WHERE id = %s", (booking_id,))
+            status_id = 2
+
+        if status_id != 2:
             print("Объект не свободен для бронирования")
             return False
         booking_date = date.today()

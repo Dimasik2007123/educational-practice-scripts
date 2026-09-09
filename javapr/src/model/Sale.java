@@ -66,7 +66,7 @@ public class Sale implements CrudOperations {
         SaleItem item = new SaleItem(this, object, price, items.size() + 1);
         items.add(item);
         item.add();
-        object.updateStatus(new RealEstateStatus(4, "Продан", "Объект продан"));
+        object.updateStatus(RealEstateStatus.findById(4));
     }
 
     public BigDecimal calculateTotal() {
@@ -82,18 +82,53 @@ public class Sale implements CrudOperations {
 
     public void closeSale() {
         for (SaleItem item : items) {
-            item.getRealEstateObject().updateStatus(new RealEstateStatus(4, "Продан", "Объект продан"));
+            item.getRealEstateObject().updateStatus(RealEstateStatus.findById(4));
         }
     }
 
     public static Sale createSale(Employee employee, Client client, ContractType contractType,
                                    List<Object[]> itemData, String notes) {
         Sale sale = new Sale(employee, client, contractType, notes);
-        sale.add();
-        for (Object[] data : itemData) {
-            RealEstateObject obj = (RealEstateObject) data[0];
-            BigDecimal price = (BigDecimal) data[1];
-            sale.addItem(obj, price);
+        String saleSql = "INSERT INTO sale (sale_date, employee_id, client_id, contract_type_id, notes) " +
+                         "VALUES (?, ?, ?, ?, ?) RETURNING id";
+        try (Connection conn = DatabaseService.getConnection();
+             PreparedStatement saleStmt = conn.prepareStatement(saleSql)) {
+            conn.setAutoCommit(false);
+            for (Object[] data : itemData) {
+                RealEstateObject obj = (RealEstateObject) data[0];
+                if (!RealEstateObject.lockAndReleaseExpiredBooking(conn, obj.getId())) {
+                    conn.rollback();
+                    return null;
+                }
+            }
+            saleStmt.setTimestamp(1, Timestamp.valueOf(sale.saleDate));
+            saleStmt.setInt(2, employee.getId());
+            saleStmt.setInt(3, client.getId());
+            saleStmt.setInt(4, contractType.getId());
+            saleStmt.setString(5, notes);
+            ResultSet saleRs = saleStmt.executeQuery();
+            if (!saleRs.next()) {
+                conn.rollback();
+                return null;
+            }
+            sale.id = saleRs.getInt(1);
+            for (int index = 0; index < itemData.size(); index++) {
+                RealEstateObject obj = (RealEstateObject) itemData.get(index)[0];
+                BigDecimal price = (BigDecimal) itemData.get(index)[1];
+                SaleItem item = new SaleItem(sale, obj, price, index + 1);
+                item.add(conn);
+                try (PreparedStatement update = conn.prepareStatement(
+                        "UPDATE real_estate_object SET real_estate_status_id = 4 WHERE id = ?")) {
+                    update.setInt(1, obj.getId());
+                    update.executeUpdate();
+                }
+                obj.setStatus(RealEstateStatus.findById(4));
+                sale.items.add(item);
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return null;
         }
         return sale;
     }

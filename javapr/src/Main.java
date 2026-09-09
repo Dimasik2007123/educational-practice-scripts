@@ -46,12 +46,18 @@ public class Main {
                 null, null,
                 new BigDecimal("5000000"),
                 new BigDecimal("10000000"),
-                "Москва", 40.0, 100.0, 1
+                "Москва", 40.0, 100.0, 1,
+                null, null, false
         );
         for (RealEstateObject foundObject : found) {
-            System.out.printf("Кадастровый номер: %s, этаж: %d, площадь: %.2f кв.м%n",
-                    foundObject.getCadastralNumber(), foundObject.getFloor(),
-                    foundObject.getTotalArea());
+            Address address = foundObject.getAddress();
+            System.out.printf("ID: %d, Тип: %s, Адрес: г. %s, ул. %s, д. %d, " +
+                            "Комнат: %s, Цена: %s, Статус: %s, Строительство: %s, " +
+                            "Срок сдачи: %s%n",
+                    foundObject.getId(), foundObject.getType().getName(), address.getCity(),
+                    address.getStreet(), address.getHouse(), foundObject.getRoomsCount(),
+                    foundObject.getPrice(), foundObject.getStatus().getName(),
+                    foundObject.getConstructionStatus().getName(), foundObject.getCompletionDate());
         }
         System.out.println("\n");
 
@@ -67,6 +73,7 @@ public class Main {
         System.out.println("Бронирование создано. ID: " + booking.getId() + "\n");
 
         System.out.println("Алгоритм 5: Оформление сделки");
+        booking.cancelBooking();
         List<Object[]> items = new ArrayList<>();
         items.add(new Object[]{obj, new BigDecimal("13500000.00")});
         ContractType contract = new ContractType(1);
@@ -78,6 +85,9 @@ public class Main {
                 items,
                 null
         );
+        if (sale == null) {
+                throw new IllegalStateException("Не удалось оформить сделку: объект недоступен для продажи");
+        }
         System.out.println("Сделка создана. ID: " + sale.getId() + "\n");
 
         System.out.println("Алгоритм 6: Генерация кода постамата");

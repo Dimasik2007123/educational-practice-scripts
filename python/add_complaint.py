@@ -33,7 +33,7 @@ if __name__ == "__main__":
     complaint_id = add_complaint(
         sale_id=12,
         client_id=1,
-        real_estate_object_id=15,
+        real_estate_object_id=14,
         status="в работе"
     )
     print(f"Претензия добавлена с ID: {complaint_id}")

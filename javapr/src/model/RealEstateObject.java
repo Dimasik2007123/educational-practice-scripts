@@ -4,6 +4,7 @@ import javapr.src.service.DatabaseService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.*;
 
 public class RealEstateObject implements CrudOperations {
@@ -87,7 +88,7 @@ public class RealEstateObject implements CrudOperations {
                 Address addr = new Address(rs.getInt("index"), rs.getString("country"), rs.getString("city"),
                                            rs.getString("street"), rs.getInt("house"), rs.getObject("building") != null ? rs.getInt("building") : null);
                 ConstructionStatus cs = new ConstructionStatus(rs.getInt("construction_status_id"));
-                RealEstateStatus st = new RealEstateStatus(rs.getInt("real_estate_status_id"));
+                RealEstateStatus st = RealEstateStatus.findById(rs.getInt("real_estate_status_id"));
                 RealEstateObject obj = new RealEstateObject(
                     type, addr, rs.getString("cadastral_number"),
                     rs.getInt("floor"), rs.getInt("apartment_number"),
@@ -116,41 +117,58 @@ public class RealEstateObject implements CrudOperations {
     }
 
     public static List<RealEstateObject> searchObjects(Integer floor, Integer roomsCount,
-                                                        BigDecimal minPrice, BigDecimal maxPrice) {
-        return searchObjects(floor, roomsCount, minPrice, maxPrice,
-                     null, null, null, null);
-        }
-
-        public static List<RealEstateObject> searchObjects(Integer floor, Integer roomsCount,
                                 BigDecimal minPrice, BigDecimal maxPrice,
                                 String city, Double minArea, Double maxArea,
-                                Integer typeId) {
+                                Integer typeId, Integer statusId,
+                                Integer constructionStatusId, boolean availableOnly) {
         List<RealEstateObject> result = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-            "SELECT id, real_estate_type_id, (address).*, cadastral_number, floor, apartment_number, " +
-            "rooms_count, total_area, living_area, construction_status_id, completion_date, price, " +
-            "real_estate_status_id FROM real_estate_object WHERE 1=1"
+            "SELECT reo.id, reo.real_estate_type_id, (reo.address).*, reo.cadastral_number, " +
+            "reo.floor, reo.apartment_number, reo.rooms_count, reo.total_area, reo.living_area, " +
+            "reo.construction_status_id, reo.completion_date, reo.price, reo.real_estate_status_id, " +
+            "ret.name AS real_estate_type_name, ret.description AS real_estate_type_description, " +
+            "res.name AS real_estate_status_name, res.description AS real_estate_status_description, " +
+            "cs.name AS construction_status_name, cs.number AS construction_status_number, " +
+            "cs.is_available_for_sale AS construction_status_available " +
+            "FROM real_estate_object reo " +
+            "JOIN real_estate_type ret ON ret.id = reo.real_estate_type_id " +
+            "JOIN real_estate_status res ON res.id = reo.real_estate_status_id " +
+            "JOIN construction_status cs ON cs.id = reo.construction_status_id " +
+            "WHERE 1=1"
         );
         List<Object> params = new ArrayList<>();
-        if (floor != null) { sql.append(" AND floor = ?"); params.add(floor); }
-        if (roomsCount != null) { sql.append(" AND rooms_count = ?"); params.add(roomsCount); }
-        if (minPrice != null) { sql.append(" AND price >= ?"); params.add(minPrice); }
-        if (maxPrice != null) { sql.append(" AND price <= ?"); params.add(maxPrice); }
-        if (city != null) { sql.append(" AND (address).city = ?"); params.add(city); }
-        if (minArea != null) { sql.append(" AND total_area >= ?"); params.add(minArea); }
-        if (maxArea != null) { sql.append(" AND total_area <= ?"); params.add(maxArea); }
-        if (typeId != null) { sql.append(" AND real_estate_type_id = ?"); params.add(typeId); }
+        if (floor != null) { sql.append(" AND reo.floor = ?"); params.add(floor); }
+        if (roomsCount != null) { sql.append(" AND reo.rooms_count = ?"); params.add(roomsCount); }
+        if (minPrice != null) { sql.append(" AND reo.price >= ?"); params.add(minPrice); }
+        if (maxPrice != null) { sql.append(" AND reo.price <= ?"); params.add(maxPrice); }
+        if (city != null) { sql.append(" AND (reo.address).city = ?"); params.add(city); }
+        if (minArea != null) { sql.append(" AND reo.total_area >= ?"); params.add(minArea); }
+        if (maxArea != null) { sql.append(" AND reo.total_area <= ?"); params.add(maxArea); }
+        if (typeId != null) { sql.append(" AND reo.real_estate_type_id = ?"); params.add(typeId); }
+        if (statusId != null) { sql.append(" AND reo.real_estate_status_id = ?"); params.add(statusId); }
+        if (constructionStatusId != null) { sql.append(" AND reo.construction_status_id = ?"); params.add(constructionStatusId); }
+        if (availableOnly) { sql.append(" AND reo.real_estate_status_id = 2"); }
 
         try (Connection conn = DatabaseService.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
             for (int i = 0; i < params.size(); i++) stmt.setObject(i + 1, params.get(i));
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                RealEstateType type = new RealEstateType(rs.getInt("real_estate_type_id"));
+                RealEstateType type = new RealEstateType(rs.getString("real_estate_type_name"),
+                                                         rs.getString("real_estate_type_description"));
+                type.setId(rs.getInt("real_estate_type_id"));
                 Address addr = new Address(rs.getInt("index"), rs.getString("country"), rs.getString("city"),
-                                           rs.getString("street"), rs.getInt("house"), rs.getInt("building"));
-                ConstructionStatus cs = new ConstructionStatus(rs.getInt("construction_status_id"));
-                RealEstateStatus st = new RealEstateStatus(rs.getInt("real_estate_status_id"));
+                                           rs.getString("street"), rs.getInt("house"),
+                                           rs.getObject("building") != null ? rs.getInt("building") : null);
+                ConstructionStatus cs = new ConstructionStatus(
+                    rs.getString("construction_status_name"),
+                    rs.getInt("construction_status_number"),
+                    rs.getBoolean("construction_status_available"));
+                cs.setId(rs.getInt("construction_status_id"));
+                RealEstateStatus st = new RealEstateStatus(
+                    rs.getInt("real_estate_status_id"),
+                    rs.getString("real_estate_status_name"),
+                    rs.getString("real_estate_status_description"));
                 RealEstateObject obj = new RealEstateObject(
                     type, addr, rs.getString("cadastral_number"),
                     rs.getInt("floor"), rs.getInt("apartment_number"),
@@ -168,16 +186,47 @@ public class RealEstateObject implements CrudOperations {
     }
 
     public boolean isAvailable() {
-        return status != null && status.getId() == 2;
+        try (Connection conn = DatabaseService.getConnection()) {
+            conn.setAutoCommit(false);
+            boolean available = lockAndReleaseExpiredBooking(conn, id);
+            conn.commit();
+            if (available) status = RealEstateStatus.findById(2);
+            return available;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
-    public Booking book(Client client, Employee employee) {
-        Booking booking = new Booking(client, employee, this);
-        booking.bookObject();
-        return booking;
+    static boolean lockAndReleaseExpiredBooking(Connection conn, int objectId) throws SQLException {
+        String sql = "SELECT reo.real_estate_status_id, b.id, b.expiration_date " +
+                     "FROM real_estate_object reo " +
+                     "LEFT JOIN booking b ON b.real_estate_object_id = reo.id " +
+                     "WHERE reo.id = ? FOR UPDATE OF reo";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, objectId);
+            ResultSet rs = stmt.executeQuery();
+            if (!rs.next()) return false;
+
+            int statusId = rs.getInt(1);
+            int bookingId = rs.getInt(2);
+            java.sql.Date expirationDate = rs.getDate(3);
+            if (statusId == 3 && !rs.wasNull() && bookingId != 0 && expirationDate != null
+                    && expirationDate.toLocalDate().isBefore(LocalDate.now())) {
+                try (PreparedStatement delete = conn.prepareStatement("DELETE FROM booking WHERE id = ?");
+                     PreparedStatement update = conn.prepareStatement(
+                             "UPDATE real_estate_object SET real_estate_status_id = 2 WHERE id = ?")) {
+                    delete.setInt(1, bookingId);
+                    delete.executeUpdate();
+                    update.setInt(1, objectId);
+                    update.executeUpdate();
+                }
+                statusId = 2;
+            }
+            return statusId == 2;
+        }
     }
 
-    // Геттеры и сеттеры
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
     public RealEstateType getType() { return type; }
