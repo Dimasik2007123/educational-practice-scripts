@@ -59,53 +59,9 @@ def search_objects(floor=None, rooms_count=None, min_price=None, max_price=None,
     return results
 
 if __name__ == "__main__":
-    # Поиск по этажу и цене
-    print("\n--- 1. Этаж=4, цена от 5 млн ---")
+    print("\nЭтаж=4, цена от 5 млн")
     objects = search_objects(floor=4, min_price=5000000)
     for obj in objects:
         address = obj[1]
         address_str = f"г. {address.city}, ул. {address.street}, д. {address.house}"
         print(f"ID: {obj[0]}, Адрес: {address_str}, Комнат: {obj[3]}, Цена: {obj[5]}")
-
-    # Поиск по городу
-    print("\n--- 2. Город = 'Москва' ---")
-    objects = search_objects(city='Москва')
-    print(f"Найдено объектов в Москве: {len(objects)}")
-
-    # Поиск по количеству комнат и цене
-    print("\n--- 3. Комнат=2, цена от 10 до 20 млн ---")
-    objects = search_objects(rooms_count=2, min_price=10000000, max_price=20000000)
-    for obj in objects:
-        address = obj[1]
-        address_str = f"г. {address.city}, ул. {address.street}, д. {address.house}"
-        print(f"ID: {obj[0]}, Адрес: {address_str}, Комнат: {obj[3]}, Цена: {obj[5]}")
-
-    # Поиск по площади
-    print("\n--- 4. Площадь от 50 до 100 кв.м ---")
-    objects = search_objects(min_area=50, max_area=100)
-    for obj in objects:
-        address = obj[1]
-        address_str = f"г. {address.city}, ул. {address.street}, д. {address.house}"
-        print(f"ID: {obj[0]}, Адрес: {address_str}, Площадь: {obj[4]}, Цена: {obj[5]}")
-
-    # Поиск по типу объекта (1 - квартира)
-    print("\n--- 5. Тип объекта = 1 (квартира) ---")
-    objects = search_objects(type_id=1)
-    print(f"Найдено квартир: {len(objects)}")
-
-    # Комбинированный поиск (все фильтры вместе)
-    print("\n--- 6. Комбинированный поиск: Москва, 2 комнаты, цена 5-15 млн, площадь 40-80, этаж 4 ---")
-    objects = search_objects(
-        city='Москва',
-        rooms_count=2,
-        min_price=5000000,
-        max_price=15000000,
-        min_area=40,
-        max_area=80,
-        floor=4
-    )
-    print(f"Найдено объектов: {len(objects)}")
-    for obj in objects:
-        address = obj[1]
-        address_str = f"г. {address.city}, ул. {address.street}, д. {address.house}"
-        print(f"ID: {obj[0]}, Адрес: {address_str}, Комнат: {obj[3]}, Площадь: {obj[4]}, Цена: {obj[5]}")

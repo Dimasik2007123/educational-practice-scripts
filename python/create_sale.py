@@ -45,10 +45,10 @@ def create_sale(employee_id, client_id, contract_type_id, items, notes=None):
 
 if __name__ == "__main__":
     sale_id = create_sale(
-        employee_id=8,          # Менеджер Ольга Новикова
-        client_id=1,            # Дмитрий Зотеев
-        contract_type_id=1,     # Договор купли-продажи
-        items=[(16, 12000000.00), (17, 18500000.00)],  # ID из INSERT выше
+        employee_id=8,
+        client_id=1,
+        contract_type_id=1,
+        items=[(15, 12000000.00)],
         notes="Продажа двух квартир"
     )
     print(f"Сделка оформлена с ID: {sale_id}")

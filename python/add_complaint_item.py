@@ -37,7 +37,7 @@ def add_complaint_item(complaint_id, description, requirement_id, claim_amount=N
 
 if __name__ == "__main__":
     result1 = add_complaint_item(
-        complaint_id=12,
+        complaint_id=11,
         description="Царапины на входной двери, требуется покраска",
         requirement_id=1,
         claim_amount=6500.00
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     print(f"Позиция 1 добавлена: {result1}")
 
     result2 = add_complaint_item(
-        complaint_id=12,
+        complaint_id=11,
         description="Не работают 4 розетки на кухне",
         requirement_id=3,
         claim_amount=3500.00

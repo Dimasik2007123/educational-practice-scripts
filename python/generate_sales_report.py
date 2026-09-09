@@ -32,5 +32,8 @@ def generate_sales_report(start_date, end_date):
 if __name__ == "__main__":
     from datetime import date
     report = generate_sales_report(date(2026, 1, 1), date(2026, 9, 8))
-    for item in report:
-        print(f"Сделка {item[0]}: {item[1]} - {item[3]} руб.")
+    sales_count = len(report)
+    sales_total = sum(item[3] for item in report)
+
+    print(f"Количество сделок: {sales_count}")
+    print(f"Сумма сделок: {sales_total} руб.")

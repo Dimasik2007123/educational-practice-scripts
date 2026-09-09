@@ -63,10 +63,11 @@ public class Complaint implements CrudOperations {
         return null;
     }
 
-    public void addItem(String description, Requirement requirement, BigDecimal claimAmount) {
+    public ComplaintItem addItem(String description, Requirement requirement, BigDecimal claimAmount) {
         ComplaintItem item = new ComplaintItem(this, requirement, description, claimAmount);
         items.add(item);
         item.add();
+        return item;
     }
 
     public void updateStatus(String newStatus) {

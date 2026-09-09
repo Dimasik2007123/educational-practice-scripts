@@ -35,5 +35,5 @@ def update_complaint_status(complaint_id, new_status):
         connection.close()
 
 if __name__ == "__main__":
-    result = update_complaint_status(12, "устранена")
-    print(f"Статус претензии 12 обновлен: {result}")
+    result = update_complaint_status(11, "устранена")
+    print(f"Статус претензии 11 обновлен: {result}")

@@ -31,7 +31,7 @@ def add_complaint(sale_id, client_id, real_estate_object_id, status="новая"
 
 if __name__ == "__main__":
     complaint_id = add_complaint(
-        sale_id=13,
+        sale_id=12,
         client_id=1,
         real_estate_object_id=15,
         status="в работе"

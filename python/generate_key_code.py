@@ -16,7 +16,7 @@ def get_connection():
     )
     return conn
 
-def generate_key_code(object_id, client_id, keys_type_id=1):  # по умолчанию 1 — "Вход"
+def generate_key_code(object_id, client_id, keys_type_id=1):
     connection = get_connection()
     cursor = connection.cursor()
     while True:
@@ -39,5 +39,5 @@ def generate_key_code(object_id, client_id, keys_type_id=1):  # по умолч�
     return code
 
 if __name__ == "__main__":
-    code = generate_key_code(15, 1, keys_type_id=1)  # 1 — "Вход"
+    code = generate_key_code(15, 1, keys_type_id=1)
     print(f"Код для постамата: {code}")
