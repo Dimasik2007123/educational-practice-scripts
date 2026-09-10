@@ -20,9 +20,11 @@ def book_object(object_id, client_id, employee_id):
     cursor = connection.cursor()
     try:
         cursor.execute("""
-            SELECT reo.real_estate_status_id, b.id, b.expiration_date
+            SELECT reo.real_estate_status_id, b.id, b.expiration_date,
+                   cs.is_available_for_sale
             FROM real_estate_object AS reo
             LEFT JOIN booking AS b ON b.real_estate_object_id = reo.id
+            JOIN construction_status AS cs ON cs.id = reo.construction_status_id
             WHERE reo.id = %s
             FOR UPDATE OF reo
         """, (object_id,))
@@ -31,7 +33,11 @@ def book_object(object_id, client_id, employee_id):
             print("Объект не найден")
             return False
 
-        status_id, booking_id, expiration_date = object_data
+        status_id, booking_id, expiration_date, is_available_for_sale = object_data
+        if not is_available_for_sale:
+            print("Объект недоступен для продажи по статусу строительства")
+            return False
+
         expired_booking = (
             status_id == 3
             and booking_id is not None

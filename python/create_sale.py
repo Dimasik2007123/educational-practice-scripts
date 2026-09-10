@@ -21,9 +21,11 @@ def create_sale(employee_id, client_id, contract_type_id, items, notes=None):
     try:
         for object_id, _ in items:
             cursor.execute("""
-                SELECT reo.real_estate_status_id, b.id, b.expiration_date
+                SELECT reo.real_estate_status_id, b.id, b.expiration_date,
+                       cs.is_available_for_sale
                 FROM real_estate_object AS reo
                 LEFT JOIN booking AS b ON b.real_estate_object_id = reo.id
+                JOIN construction_status AS cs ON cs.id = reo.construction_status_id
                 WHERE reo.id = %s
                 FOR UPDATE OF reo
             """, (object_id,))
@@ -32,7 +34,11 @@ def create_sale(employee_id, client_id, contract_type_id, items, notes=None):
                 print(f"Объект с ID {object_id} не найден")
                 return None
 
-            status_id, booking_id, expiration_date = object_data
+            status_id, booking_id, expiration_date, is_available_for_sale = object_data
+            if not is_available_for_sale:
+                print(f"Объект с ID {object_id} недоступен для продажи по статусу строительства")
+                return None
+
             expired_booking = (
                 status_id == 3
                 and booking_id is not None

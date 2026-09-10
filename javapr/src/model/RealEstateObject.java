@@ -199,8 +199,9 @@ public class RealEstateObject implements CrudOperations {
     }
 
     static boolean lockAndReleaseExpiredBooking(Connection conn, int objectId) throws SQLException {
-        String sql = "SELECT reo.real_estate_status_id, b.id, b.expiration_date " +
+        String sql = "SELECT reo.real_estate_status_id, b.id, b.expiration_date, cs.is_available_for_sale " +
                      "FROM real_estate_object reo " +
+                     "JOIN construction_status cs ON cs.id = reo.construction_status_id " +
                      "LEFT JOIN booking b ON b.real_estate_object_id = reo.id " +
                      "WHERE reo.id = ? FOR UPDATE OF reo";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -211,6 +212,9 @@ public class RealEstateObject implements CrudOperations {
             int statusId = rs.getInt(1);
             int bookingId = rs.getInt(2);
             java.sql.Date expirationDate = rs.getDate(3);
+                boolean availableForSale = rs.getBoolean(4);
+                if (!availableForSale) return false;
+
             if (statusId == 3 && !rs.wasNull() && bookingId != 0 && expirationDate != null
                     && expirationDate.toLocalDate().isBefore(LocalDate.now())) {
                 try (PreparedStatement delete = conn.prepareStatement("DELETE FROM booking WHERE id = ?");
