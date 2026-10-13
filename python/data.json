@@ -1,0 +1,306 @@
+{
+  "position": [
+    {
+      "id": 1,
+      "name": "Менеджер по продажам",
+      "salary": 70000
+    }
+  ],
+  "employee": [
+    {
+      "id": 1,
+      "first_name": "Анна",
+      "last_name": "Иванова",
+      "patronymic": "Игоревна",
+      "position_id": 1,
+      "phone": "79000000001",
+      "email": "manager@example.test",
+      "hire_date": "2025-01-10"
+    }
+  ],
+  "client": [
+    {
+      "id": 1,
+      "first_name": "Иван",
+      "last_name": "Покупатель",
+      "patronymic": "Иванович",
+      "phone": "79000000101",
+      "email": "client1@example.test",
+      "birth_date": "1990-01-01",
+      "passport_series": 4500,
+      "passport_number": 123451,
+      "issue_date": "2015-01-01",
+      "issued_by": "Учебные данные",
+      "unit_code": "770-001",
+      "registration_address": "Москва, учебный адрес"
+    },
+    {
+      "id": 2,
+      "first_name": "Пётр",
+      "last_name": "Покупатель",
+      "patronymic": "Иванович",
+      "phone": "79000000102",
+      "email": "client2@example.test",
+      "birth_date": "1990-01-01",
+      "passport_series": 4500,
+      "passport_number": 123452,
+      "issue_date": "2015-01-01",
+      "issued_by": "Учебные данные",
+      "unit_code": "770-001",
+      "registration_address": "Москва, учебный адрес"
+    }
+  ],
+  "real_estate_type": [
+    {
+      "id": 1,
+      "name": "Квартира",
+      "description": "Жилое помещение"
+    }
+  ],
+  "real_estate_status": [
+    {
+      "id": 2,
+      "name": "свободен",
+      "description": "Можно бронировать"
+    },
+    {
+      "id": 3,
+      "name": "забронирован",
+      "description": "Проверить историю броней"
+    },
+    {
+      "id": 4,
+      "name": "продан",
+      "description": "Продажа оформлена"
+    }
+  ],
+  "construction_status": [
+    {
+      "id": 1,
+      "name": "сдан",
+      "number": 5,
+      "is_available_for_sale": true
+    },
+    {
+      "id": 2,
+      "name": "стены",
+      "number": 2,
+      "is_available_for_sale": true
+    },
+    {
+      "id": 3,
+      "name": "приостановлен",
+      "number": 1,
+      "is_available_for_sale": false
+    }
+  ],
+  "contract_type": [
+    {
+      "id": 1,
+      "name": "Договор купли-продажи",
+      "description": "Продажа объекта"
+    }
+  ],
+  "keys_type": [
+    {
+      "id": 1,
+      "name": "входные",
+      "description": "Входная дверь"
+    }
+  ],
+  "real_estate_object": [
+    {
+      "id": 1,
+      "real_estate_type_id": 1,
+      "index": 123000,
+      "country": "Россия",
+      "city": "Москва",
+      "street": "Учебная",
+      "house": 1,
+      "building": 1,
+      "cadastral_number": "77:01:0000001:1",
+      "floor": 4,
+      "apartment_number": 1,
+      "rooms_count": 2,
+      "total_area": 50,
+      "living_area": 30,
+      "construction_status_id": 1,
+      "completion_date": "2026-09-30",
+      "price": 8000000,
+      "real_estate_status_id": 2
+    },
+    {
+      "id": 2,
+      "real_estate_type_id": 1,
+      "index": 123000,
+      "country": "Россия",
+      "city": "Москва",
+      "street": "Учебная",
+      "house": 1,
+      "building": 1,
+      "cadastral_number": "77:01:0000001:2",
+      "floor": 4,
+      "apartment_number": 2,
+      "rooms_count": 2,
+      "total_area": 50,
+      "living_area": 30,
+      "construction_status_id": 1,
+      "completion_date": "2026-09-30",
+      "price": 8200000,
+      "real_estate_status_id": 3
+    },
+    {
+      "id": 3,
+      "real_estate_type_id": 1,
+      "index": 123000,
+      "country": "Россия",
+      "city": "Москва",
+      "street": "Учебная",
+      "house": 1,
+      "building": 1,
+      "cadastral_number": "77:01:0000001:3",
+      "floor": 4,
+      "apartment_number": 3,
+      "rooms_count": 2,
+      "total_area": 50,
+      "living_area": 30,
+      "construction_status_id": 1,
+      "completion_date": "2026-09-30",
+      "price": 7000000,
+      "real_estate_status_id": 3
+    },
+    {
+      "id": 4,
+      "real_estate_type_id": 1,
+      "index": 123000,
+      "country": "Россия",
+      "city": "Москва",
+      "street": "Учебная",
+      "house": 1,
+      "building": 1,
+      "cadastral_number": "77:01:0000001:4",
+      "floor": 4,
+      "apartment_number": 4,
+      "rooms_count": 2,
+      "total_area": 50,
+      "living_area": 30,
+      "construction_status_id": 3,
+      "completion_date": "2027-09-30",
+      "price": 7500000,
+      "real_estate_status_id": 2
+    },
+    {
+      "id": 5,
+      "real_estate_type_id": 1,
+      "index": 123000,
+      "country": "Россия",
+      "city": "Москва",
+      "street": "Учебная",
+      "house": 1,
+      "building": 1,
+      "cadastral_number": "77:01:0000001:5",
+      "floor": 4,
+      "apartment_number": 5,
+      "rooms_count": 2,
+      "total_area": 50,
+      "living_area": 30,
+      "construction_status_id": 1,
+      "completion_date": "2026-09-30",
+      "price": 9000000,
+      "real_estate_status_id": 4
+    },
+    {
+      "id": 6,
+      "real_estate_type_id": 1,
+      "index": 123000,
+      "country": "Россия",
+      "city": "Москва",
+      "street": "Учебная",
+      "house": 1,
+      "building": 1,
+      "cadastral_number": "77:01:0000001:6",
+      "floor": 4,
+      "apartment_number": 6,
+      "rooms_count": 2,
+      "total_area": 50,
+      "living_area": 30,
+      "construction_status_id": 2,
+      "completion_date": "2027-09-30",
+      "price": 6000000,
+      "real_estate_status_id": 2
+    }
+  ],
+  "booking": [
+    {
+      "id": 1,
+      "booking_date": "2026-10-10",
+      "expiration_date": "2026-10-24",
+      "client_id": 2,
+      "employee_id": 1,
+      "real_estate_object_id": 2,
+      "status": "active"
+    },
+    {
+      "id": 2,
+      "booking_date": "2026-09-01",
+      "expiration_date": "2026-09-15",
+      "client_id": 2,
+      "employee_id": 1,
+      "real_estate_object_id": 3,
+      "status": "active"
+    },
+    {
+      "id": 3,
+      "booking_date": "2026-09-01",
+      "expiration_date": "2026-09-15",
+      "client_id": 2,
+      "employee_id": 1,
+      "real_estate_object_id": 1,
+      "status": "cancelled"
+    }
+  ],
+  "sale": [
+    {
+      "id": 1,
+      "sale_date": "2026-09-20",
+      "employee_id": 1,
+      "client_id": 2,
+      "contract_type_id": 1,
+      "notes": "Исходная продажа"
+    }
+  ],
+  "sale_item": [
+    {
+      "id": 1,
+      "sale_id": 1,
+      "real_estate_object_id": 5,
+      "price": 9000000,
+      "line_number": 1
+    }
+  ],
+  "acceptance_certificate": [
+    {
+      "id": 1,
+      "issue_date": "2026-09-25",
+      "sale_item_id": 1
+    }
+  ],
+  "keys": [
+    {
+      "id": 1,
+      "real_estate_object_id": 5,
+      "key_set_number": 1,
+      "quantity": 6,
+      "issue_date": "2026-09-25",
+      "locker_code": 100000,
+      "keys_type_id": 1
+    }
+  ],
+  "acceptance_certificate_item": [
+    {
+      "acceptance_certificate_id": 1,
+      "keys_id": 1,
+      "line_number": 1
+    }
+  ]
+}

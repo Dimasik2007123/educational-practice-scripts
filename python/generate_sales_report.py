@@ -1,39 +1,25 @@
-import psycopg2
-import os
-from dotenv import load_dotenv
+"""Алгоритм 5: соединение сделок с позициями и расчёт итогов за период."""
 
-load_dotenv()
+from datetime import date
 
-def get_connection():
-    conn = psycopg2.connect(
-        host=os.getenv('DB_HOST'),
-        port=os.getenv('DB_PORT'),
-        database=os.getenv('DB_NAME'),
-        user=os.getenv('DB_USER'),
-        password=os.getenv('DB_PASSWORD')
-    )
-    return conn
 
-def generate_sales_report(start_date, end_date):
-    connection = get_connection()
-    cursor = connection.cursor()
-    cursor.execute("""
-        SELECT s.id, s.sale_date, s.client_id, SUM(si.price) as total
-        FROM sale s
-        JOIN sale_item si ON s.id = si.sale_id
-        WHERE s.sale_date BETWEEN %s AND %s
-        GROUP BY s.id
-    """, (start_date, end_date))
-    results = cursor.fetchall()
-    cursor.close()
-    connection.close()
-    return results
-
-if __name__ == "__main__":
-    from datetime import date
-    report = generate_sales_report(date(2026, 1, 1), date(2026, 9, 8))
-    sales_count = len(report)
-    sales_total = sum(item[3] for item in report)
-
-    print(f"Количество сделок: {sales_count}")
-    print(f"Сумма сделок: {sales_total} руб.")
+def generate_sales_report(sales, sale_items, start_date, end_date):
+    """Худшее время O(s*(p+1)); память O(s). Границы периода включены."""
+    date.fromisoformat(start_date)
+    date.fromisoformat(end_date)
+    if start_date > end_date:
+        raise ValueError("Начало периода позже его окончания")
+    rows = []
+    total = 0
+    for sale in sales:
+        if start_date <= sale["sale_date"] <= end_date:
+            sale_total = 0
+            for item in sale_items:
+                if item["sale_id"] == sale["id"]:
+                    sale_total += item["price"]
+            rows.append({
+                "sale_id": sale["id"], "sale_date": sale["sale_date"],
+                "client_id": sale["client_id"], "total": sale_total,
+            })
+            total += sale_total
+    return {"rows": rows, "sales_count": len(rows), "sales_total": total}

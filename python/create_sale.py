@@ -1,87 +1,52 @@
+"""Алгоритм 3: проверка комплекта объектов и оформление сделки."""
+
 from datetime import date
-import psycopg2
-import os
-from dotenv import load_dotenv
+from data_utils import require_row, next_id, availability_reason, active_booking
 
-load_dotenv()
 
-def get_connection():
-    conn = psycopg2.connect(
-        host=os.getenv('DB_HOST'),
-        port=os.getenv('DB_PORT'),
-        database=os.getenv('DB_NAME'),
-        user=os.getenv('DB_USER'),
-        password=os.getenv('DB_PASSWORD')
-    )
-    return conn
+def create_sale(data, employee_id, client_id, contract_type_id, items, as_of, notes=None):
+    """items — пары (object_id, price); цены в целых рублях.
 
-def create_sale(employee_id, client_id, contract_type_id, items, notes=None):
-    connection = get_connection()
-    cursor = connection.cursor()
-    try:
-        for object_id, _ in items:
-            cursor.execute("""
-                SELECT reo.real_estate_status_id, b.id, b.expiration_date,
-                       cs.is_available_for_sale
-                FROM real_estate_object AS reo
-                LEFT JOIN booking AS b ON b.real_estate_object_id = reo.id
-                JOIN construction_status AS cs ON cs.id = reo.construction_status_id
-                WHERE reo.id = %s
-                FOR UPDATE OF reo
-            """, (object_id,))
-            object_data = cursor.fetchone()
-            if object_data is None:
-                print(f"Объект с ID {object_id} не найден")
-                return None
-
-            status_id, booking_id, expiration_date, is_available_for_sale = object_data
-            if not is_available_for_sale:
-                print(f"Объект с ID {object_id} недоступен для продажи по статусу строительства")
-                return None
-
-            expired_booking = (
-                status_id == 3
-                and booking_id is not None
-                and expiration_date < date.today()
-            )
-            if expired_booking:
-                cursor.execute("DELETE FROM booking WHERE id = %s", (booking_id,))
-                status_id = 2
-
-            if status_id != 2:
-                print(f"Объект с ID {object_id} не свободен для продажи")
-                return None
-
-        cursor.execute("""
-            INSERT INTO sale (sale_date, employee_id, client_id, contract_type_id, notes)
-            VALUES (%s, %s, %s, %s, %s)
-            RETURNING id
-        """, (date.today(), employee_id, client_id, contract_type_id, notes))
-        sale_id = cursor.fetchone()[0]
-        for idx, (object_id, price) in enumerate(items, start=1):
-            cursor.execute("""
-                INSERT INTO sale_item (sale_id, real_estate_object_id, price, line_number)
-                VALUES (%s, %s, %s, %s)
-            """, (sale_id, object_id, price, idx))
-            cursor.execute("""
-                UPDATE real_estate_object SET real_estate_status_id = 4
-                WHERE id = %s
-            """, (object_id,))
-        connection.commit()
-        return sale_id
-    except Exception as e:
-        print(f"Ошибка: {e}")
-        return None
-    finally:
-        cursor.close()
-        connection.close()
-
-if __name__ == "__main__":
-    sale_id = create_sale(
-        employee_id=8,
-        client_id=1,
-        contract_type_id=1,
-        items=[(14, 12000000.00)],
-        notes="Продажа квартиры"
-    )
-    print(f"Сделка оформлена с ID: {sale_id}")
+    Сначала проверяется весь комплект. Собственная бронь разрешена,
+    чужая — запрещена. При отказе данные остаются неизменными.
+    """
+    date.fromisoformat(as_of)
+    require_row(data["client"], client_id, "Клиент")
+    require_row(data["employee"], employee_id, "Сотрудник")
+    require_row(data["contract_type"], contract_type_id, "Тип договора")
+    if not items:
+        raise ValueError("Сделка должна содержать хотя бы один объект")
+    checked = []
+    for object_id, price in items:
+        if isinstance(price, bool) or not isinstance(price, int) or price <= 0:
+            raise ValueError(
+                "Цена должна быть положительным целым числом рублей")
+        for previous, _ in checked:
+            if previous["id"] == object_id:
+                raise ValueError("Объект повторяется в сделке")
+        obj = require_row(data["real_estate_object"], object_id, "Объект")
+        reason = availability_reason(data, obj, as_of, "9999-12-31", client_id)
+        if reason is not None:
+            raise ValueError(reason)
+        for existing_item in data["sale_item"]:
+            if existing_item["real_estate_object_id"] == object_id:
+                raise ValueError("Объект уже присутствует в продаже")
+        checked.append((obj, price))
+    sale_id = next_id(data["sale"])
+    item_id = next_id(data["sale_item"])
+    sale = {
+        "id": sale_id, "sale_date": as_of, "employee_id": employee_id,
+        "client_id": client_id, "contract_type_id": contract_type_id, "notes": notes,
+    }
+    data["sale"].append(sale)
+    for line_number, (obj, price) in enumerate(checked, start=1):
+        data["sale_item"].append({
+            "id": item_id, "sale_id": sale_id, "real_estate_object_id": obj["id"],
+            "price": price, "line_number": line_number,
+        })
+        item_id += 1
+        obj["real_estate_status_id"] = 4
+        for booking in data["booking"]:
+            if booking["real_estate_object_id"] == obj["id"] and active_booking(booking, as_of, "9999-12-31"):
+                booking["status"] = "fulfilled"
+    return dict(sale)
