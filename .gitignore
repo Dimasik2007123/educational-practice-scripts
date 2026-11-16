@@ -1,2 +1,7 @@
 /python/.env
 /javapr/.env
+*.class
+target/
+build/
+out/
+__pycache__/
