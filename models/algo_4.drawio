@@ -1,0 +1,92 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="algo_4" name="Генерация случайного кода постамата">
+    <mxGraphModel dx="1981" dy="1092" grid="1" gridSize="10" guides="0" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="start" parent="1" style="shape=ellipse;whiteSpace=wrap;html=0;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;" value="Начало" vertex="1">
+          <mxGeometry height="50" width="400" x="170" y="35" as="geometry" />
+        </mxCell>
+        <mxCell id="input" parent="1" style="shape=parallelogram;whiteSpace=wrap;html=0;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;perimeter=parallelogramPerimeter;size=0.12;" value="Занятые шестизначные коды&#xa;occupied_codes" vertex="1">
+          <mxGeometry height="70" width="400" x="170" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="set" parent="1" style="shape=rectangle;whiteSpace=wrap;html=0;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;" value="Создать множество занятых кодов&#xa;occupied = set(occupied_codes)" vertex="1">
+          <mxGeometry height="70" width="400" x="170" y="235" as="geometry" />
+        </mxCell>
+        <mxCell id="full" parent="1" style="shape=rhombus;whiteSpace=wrap;html=0;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;" value="Заняты все&#xa;900000 кодов?" vertex="1">
+          <mxGeometry height="110" width="380" x="180" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="generate" parent="1" style="shape=rectangle;whiteSpace=wrap;html=0;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;" value="Сгенерировать случайный код&#xa;code = 100000 + randbelow(900000)" vertex="1">
+          <mxGeometry height="75" width="400" x="170" y="535" as="geometry" />
+        </mxCell>
+        <mxCell id="exists" parent="1" style="shape=rhombus;whiteSpace=wrap;html=0;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;" value="code есть&#xa;в occupied?" vertex="1">
+          <mxGeometry height="110" width="380" x="180" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="return" parent="1" style="shape=parallelogram;whiteSpace=wrap;html=0;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;perimeter=parallelogramPerimeter;size=0.12;" value="Вернуть сгенерированный код&#xa;return code" vertex="1">
+          <mxGeometry height="70" width="400" x="170" y="880" as="geometry" />
+        </mxCell>
+        <mxCell id="end" parent="1" style="shape=ellipse;whiteSpace=wrap;html=0;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;" value="Конец" vertex="1">
+          <mxGeometry height="50" width="400" x="170" y="1030" as="geometry" />
+        </mxCell>
+        <mxCell id="error" parent="1" style="shape=parallelogram;whiteSpace=wrap;html=0;fontFamily=Arial;fontSize=14;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;perimeter=parallelogramPerimeter;size=0.12;" value="Сообщить об ошибке:&#xa;свободных&#xa;кодов нет" vertex="1">
+          <mxGeometry height="100" width="190" x="610" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="fail" parent="1" style="shape=ellipse;whiteSpace=wrap;html=0;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=#000000;strokeWidth=1.5;" value="Конец: ошибка" vertex="1">
+          <mxGeometry height="50" width="190" x="610" y="680" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_0" edge="1" parent="1" source="start" style="edgeStyle=none;html=0;strokeColor=#000000;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=1.0;exitPerimeter=0;entryX=0.5;entryY=0.0;entryPerimeter=0;" target="input">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_1" edge="1" parent="1" source="input" style="edgeStyle=none;html=0;strokeColor=#000000;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=1.0;exitPerimeter=0;entryX=0.5;entryY=0.0;entryPerimeter=0;" target="set">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_2" edge="1" parent="1" source="set" style="edgeStyle=none;html=0;strokeColor=#000000;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=1.0;exitPerimeter=0;entryX=0.5;entryY=0.0;entryPerimeter=0;" target="full">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_3" edge="1" parent="1" source="full" style="edgeStyle=none;html=0;strokeColor=#000000;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=1.0;exitPerimeter=0;entryX=0.5;entryY=0.0;entryPerimeter=0;" target="generate">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="label_3" parent="1" style="text;html=0;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=none;" value="нет" vertex="1">
+          <mxGeometry height="22" width="38" x="377" y="484" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_4" edge="1" parent="1" source="full" style="edgeStyle=none;html=0;strokeColor=#000000;strokeWidth=1.5;endArrow=block;endFill=1;exitX=1.0;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=0.0;entryPerimeter=0;rounded=0;curved=0;" target="error">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="705" y="405" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label_4" parent="1" style="text;html=0;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=none;" value="да" vertex="1">
+          <mxGeometry height="22" width="38" x="575" y="378" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_5" edge="1" parent="1" source="generate" style="edgeStyle=none;html=0;strokeColor=#000000;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=1.0;exitPerimeter=0;entryX=0.5;entryY=0.0;entryPerimeter=0;" target="exists">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_6" edge="1" parent="1" source="exists" style="edgeStyle=none;html=0;strokeColor=#000000;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.0;exitY=0.5;exitPerimeter=0;entryX=0.5;entryY=0.0;entryPerimeter=0;rounded=0;curved=0;" target="generate">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="85" y="735" />
+              <mxPoint x="85" y="500" />
+              <mxPoint x="370" y="500" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="label_6" parent="1" style="text;html=0;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=none;" value="да" vertex="1">
+          <mxGeometry height="22" width="38" x="112" y="707" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_7" edge="1" parent="1" source="exists" style="edgeStyle=none;html=0;strokeColor=#000000;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=1.0;exitPerimeter=0;entryX=0.5;entryY=0.0;entryPerimeter=0;" target="return">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="label_7" parent="1" style="text;html=0;align=center;verticalAlign=middle;fontFamily=Arial;fontSize=16;fillColor=#ffffff;strokeColor=none;" value="нет" vertex="1">
+          <mxGeometry height="22" width="38" x="377" y="822" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_8" edge="1" parent="1" source="return" style="edgeStyle=none;html=0;strokeColor=#000000;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=1.0;exitPerimeter=0;entryX=0.5;entryY=0.0;entryPerimeter=0;" target="end">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_9" edge="1" parent="1" source="error" style="edgeStyle=none;html=0;strokeColor=#000000;strokeWidth=1.5;endArrow=block;endFill=1;exitX=0.5;exitY=1.0;exitPerimeter=0;entryX=0.5;entryY=0.0;entryPerimeter=0;" target="fail">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
