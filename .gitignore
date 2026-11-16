@@ -1,5 +1,6 @@
 /python/.env
-/javapr/.env
+/javapr/
+/sql/
 *.class
 target/
 build/

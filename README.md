@@ -54,5 +54,3 @@ java -cp build Verification src/java/data.json
 - `python/` — скрипты и тестовые данные для КТ2.
 - `src/java/` — реализация пяти операций на Java для КТ3 и инструкция запуска.
 - `models/` — BPMN, модели данных, блок-схемы и диаграмма классов. Файлы `.drawio` открываются в draw.io, `bpmn.bpmn` — в bpmn.io. Актуальная диаграмма классов — `classes.drawio` и `classes.png`.
-- `javapr/` — реализация на Java с подключением к PostgreSQL.
-- `sql/` — создание и заполнение базы данных.
