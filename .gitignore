@@ -1,4 +1,6 @@
-/python/.env
+.env
+.env.*
+.vscode/
 /javapr/
 /sql/
 *.class
