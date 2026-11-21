@@ -32,6 +32,8 @@ public class Booking {
     }
 
     public Booking bookObject(AgencyData data) {
+        if (expirationDate.isBefore(bookingDate))
+            throw new IllegalArgumentException("Booking end date is before start date");
         if (data.bookings().stream().anyMatch(existing -> existing.getId() == id))
             throw new IllegalArgumentException("Booking already registered or ID is stale");
         Participant buyer = AgencyData.require(data.clients(), Client::getId, clientId, "Client");

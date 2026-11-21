@@ -16,6 +16,21 @@ public class Verification {
             .stream().map(RealEstateObject::getId).toList().equals(List.of(1,2,3,4)), "search");
         check(d.searchObjects(Map.of("min_completion_date","2027-01-01")).size() == 2, "date filter");
         check(d.searchObjects(Map.of("floor", 4)).size() == 6, "floor filter");
+        int bookingsBefore = d.getBookings().size();
+        int propertyStatusBefore = d.getProperties().get(0).getRealEstateStatusId();
+        Booking reversed = new Booking(AgencyData.row("id", 4, "booking_date", DAY.toString(),
+            "expiration_date", DAY.minusDays(1).toString(), "client_id", 1,
+            "employee_id", 1, "real_estate_object_id", 1, "status", "active"));
+        rejects(() -> reversed.bookObject(d));
+        check(d.getBookings().size() == bookingsBefore
+            && d.getProperties().get(0).getRealEstateStatusId() == propertyStatusBefore,
+            "invalid booking dates changed data");
+        AgencyData sameDayData = AgencyData.load(Path.of(args.length == 0 ? "src/java/data.json" : args[0]));
+        Booking sameDay = new Booking(AgencyData.row("id", 4, "booking_date", DAY.toString(),
+            "expiration_date", DAY.toString(), "client_id", 1,
+            "employee_id", 1, "real_estate_object_id", 1, "status", "active"));
+        sameDay.bookObject(sameDayData);
+        check(sameDayData.getBookings().size() == bookingsBefore + 1, "same-day booking");
         Booking b = d.prepareBooking(1,1,1,DAY).bookObject(d);
         check(b.getId() == 4 && b.getExpirationDate().equals(LocalDate.parse("2026-10-27")), "booking");
         rejects(() -> d.prepareBooking(1,2,1,DAY).bookObject(d));
