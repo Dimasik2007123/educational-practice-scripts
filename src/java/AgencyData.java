@@ -110,8 +110,21 @@ public class AgencyData {
     public RealEstateObject getProperty(int id) { return property(id); }
 
     public List<RealEstateObject> searchObjects(Map<String,Object> criteria) {
+        Map<String,Object> filters = new HashMap<>(criteria);
+        Object requestedDate = filters.remove("available_on");
+        LocalDate start = requestedDate == null ? null : LocalDate.parse(requestedDate.toString());
+        LocalDate end = start == null ? null : start.plusDays(14);
+        Object requestedStatus = filters.get("real_estate_status_id");
+        if (start != null && requestedStatus instanceof Number
+                && ((Number) requestedStatus).doubleValue() == 2.0) {
+            filters.remove("real_estate_status_id");
+        }
         List<RealEstateObject> result = new ArrayList<>();
-        for (RealEstateObject object : properties) if (object.matches(criteria)) result.add(object);
+        for (RealEstateObject object : properties) {
+            if (object.matches(filters) && (start == null || availability(object, start, end, null) == null)) {
+                result.add(object);
+            }
+        }
         return result;
     }
 

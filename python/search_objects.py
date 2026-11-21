@@ -1,12 +1,30 @@
 """Алгоритм 1: поиск объектов по фиксированному набору критериев."""
 
+from datetime import date, timedelta
 
-def search_objects(objects, criteria):
+from data_utils import availability_reason
+
+
+def search_objects(objects, criteria, data=None):
     """Вернуть копии подходящих карточек."""
+    filters = dict(criteria)
+    requested_date = filters.pop("available_on", None)
+    if requested_date is not None:
+        if data is None:
+            raise ValueError("Для поиска по доступности необходим набор данных")
+        start = date.fromisoformat(requested_date)
+        if start.isoformat() != requested_date:
+            raise ValueError("Дата задаётся в формате YYYY-MM-DD")
+        end = (start + timedelta(days=14)).isoformat()
+        if filters.get("real_estate_status_id") == 2:
+            filters.pop("real_estate_status_id")
     result = []
 
     for obj in objects:
-        if matches_filters(obj, criteria):
+        if matches_filters(obj, filters) and (
+            requested_date is None
+            or availability_reason(data, obj, requested_date, end) is None
+        ):
             result.append(dict(obj))
 
     return result

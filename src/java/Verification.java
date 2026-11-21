@@ -16,6 +16,16 @@ public class Verification {
             .stream().map(RealEstateObject::getId).toList().equals(List.of(1,2,3,4)), "search");
         check(d.searchObjects(Map.of("min_completion_date","2027-01-01")).size() == 2, "date filter");
         check(d.searchObjects(Map.of("floor", 4)).size() == 6, "floor filter");
+        check(d.searchObjects(Map.of("real_estate_status_id", 2, "available_on", "2026-10-13"))
+            .stream().map(RealEstateObject::getId).toList().equals(List.of(1,3,6)), "availability search");
+        check(d.searchObjects(Map.of("real_estate_status_id", 2))
+            .stream().map(RealEstateObject::getId).toList().equals(List.of(1,4,6)), "stored status search");
+        check(!d.searchObjects(Map.of("available_on", "2026-10-24")).stream()
+            .anyMatch(x -> x.getId() == 2), "last booking day is occupied");
+        check(!d.searchObjects(Map.of("available_on", "2026-09-27")).stream()
+            .anyMatch(x -> x.getId() == 2), "future booking overlaps requested interval");
+        check(d.searchObjects(Map.of("available_on", "2026-10-25")).stream()
+            .anyMatch(x -> x.getId() == 2), "booking day after expiry is available");
         int bookingsBefore = d.getBookings().size();
         int propertyStatusBefore = d.getProperties().get(0).getRealEstateStatusId();
         Booking reversed = new Booking(AgencyData.row("id", 4, "booking_date", DAY.toString(),
@@ -33,6 +43,8 @@ public class Verification {
         check(sameDayData.getBookings().size() == bookingsBefore + 1, "same-day booking");
         Booking b = d.prepareBooking(1,1,1,DAY).bookObject(d);
         check(b.getId() == 4 && b.getExpirationDate().equals(LocalDate.parse("2026-10-27")), "booking");
+        check(d.searchObjects(Map.of("available_on", DAY.toString())).stream()
+            .noneMatch(x -> x.getId() == 1), "new booking blocks availability search");
         rejects(() -> d.prepareBooking(1,2,1,DAY).bookObject(d));
         rejects(() -> d.prepareBooking(4,1,1,DAY).bookObject(d));
         rejects(() -> b.bookObject(d));
