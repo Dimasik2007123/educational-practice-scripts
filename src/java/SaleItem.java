@@ -22,7 +22,9 @@ public class SaleItem {
     public int getLineNumber() { return lineNumber; }
 
     public AcceptanceCertificate registerCertificate(AgencyData data, LocalDate issueDate) {
-        AgencyData.require(data.saleItems(),SaleItem::getId,id,"Sale item");
+        SaleItem item = AgencyData.require(data.saleItems(),SaleItem::getId,id,"Sale item");
+        Sale sale = AgencyData.require(data.sales(),Sale::getId,item.getSaleId(),"Sale");
+        if (issueDate.isBefore(sale.getSaleDate())) throw new IllegalArgumentException("Certificate predates sale");
         if (data.certificates().stream().anyMatch(c -> c.getSaleItemId() == id)) throw new IllegalArgumentException("Certificate already exists");
         AcceptanceCertificate cert = new AcceptanceCertificate(AgencyData.row("id",AgencyData.nextId(data.certificates(),AcceptanceCertificate::getId),
             "issue_date",issueDate.toString(),"sale_item_id",id));

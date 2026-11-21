@@ -49,7 +49,12 @@ public class Verification {
         check(client.role().equals("client") && employee.role().equals("employee") && client.canPurchase() && !employee.canPurchase(), "participant implementations");
         check(d.getProperties().get(0).getRealEstateStatusId()==4 && d.getProperties().get(2).getRealEstateStatusId()==4, "sale statuses");
         SaleItem item=d.getSaleItems().stream().filter(x -> x.getSaleId()==2 && x.getRealEstateObjectId()==1).findFirst().orElseThrow();
+        int certificatesBefore = d.certificates().size();
+        rejects(() -> item.registerCertificate(d, DAY.minusDays(1)));
+        check(d.certificates().size() == certificatesBefore, "invalid certificate date changed data");
         AcceptanceCertificate cert=item.registerCertificate(d,DAY);
+        check(cert.getIssueDate().equals(DAY) && d.certificates().size() == certificatesBefore + 1,
+            "certificate registration on sale date");
         rejects(() -> cert.generateKeyCode(d,DAY.minusDays(1),1));
         Keys key=cert.generateKeyCode(d,DAY,1);
         check(key.getLockerCode()>=100000 && key.getLockerCode()<=999999 && key.getLockerCode()!=100000, "key code");
